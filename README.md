@@ -64,7 +64,7 @@ int ksw_gg(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *ta
 typedef struct { int32_t h, e; } eh_t; 
 ```
 
-* 用 $\text{eh_t}$ 存储 $H(i)(j-1)$, $\text{eh_t}$ 存储 $E(i+1)(j)$
+* 用 \text{eh_t} 存储 $H(i)(j-1)$, \text{eh_t} 存储 $E(i+1)(j)$
   由于为了节省空间，用了滚动优化，所以当遍历到下一层i时，可以从 $eh$ 中直接读取到 $H(i-1)(j-1)$ 和 $E(i)(j)$ 以便后续状态转移
 
 ### 状态转移方程（NW）
