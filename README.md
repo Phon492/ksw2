@@ -80,8 +80,8 @@ $$
 
 ### 状态转移方程（SW）
 
-$$
+$$$$
 H(i,j) = \max \left\{ 0,\; H(i-1,j-1) + S(i,j),\; E(i,j),\; F(i,j) \right\} \\
 E(i+1,j) = \max \left\{ 0,\; H(i,j) - gapo,\; E(i,j) - gape \right\} \\
 F(i,j+1) = \max \left\{ 0,\; H(i,j) - gapo,\; F(i,j) - gape \right\}
-$$
+$$$$
