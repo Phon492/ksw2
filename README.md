@@ -73,9 +73,9 @@ $$
 \begin{aligned}
 H(i,j) &= \max\{H(i-1,j-1)+S(i,j), E(i,j), F(i,j)\} \\
 E(i+1,j) &= \max\{(H(i,j)-\mathrm{gapo}, E(i,j))\} - \mathrm{gape} \\
-         &= \max\{H(i,j)-\mathrm{gapoe}, E(i,j)-\mathrm{gape}\} \\
-F(i,j+1) &= \max\{H(i,j)-\mathrm{gapo}, F(i,j)\} - \mathrm{gape} \\
-         &= \max\{H(i,j)-\mathrm{gapoe}, F(i,j)-\mathrm{gape}\}
+         &= \max\{(H(i,j)-\mathrm{gapoe}, E(i,j)-\mathrm{gape}\)} \\
+F(i,j+1) &= \max\{(H(i,j)-\mathrm{gapo}, F(i,j))\} - \mathrm{gape}) \\
+         &= \max\{(H(i,j)-\mathrm{gapoe}, F(i,j)-\mathrm{gape})\}
 \end{aligned}
 $$
 
@@ -85,8 +85,8 @@ $$
 
 $$
 \begin{aligned}
-H(i,j) &= \max\{0, H(i-1,j-1)+S(i,j), E(i,j), F(i,j)\} \\
-E(i+1,j) &= \max\{0, H(i,j)-\mathrm{gapoe}, E(i,j)-\mathrm{gape}\} \\
-F(i,j+1) &= \max\{0, H(i,j)-\mathrm{gapoe}, F(i,j)-\mathrm{gape}\}
+H(i,j) &= \max\{(0, H(i-1,j-1)+S(i,j), E(i,j), F(i,j))\} \\
+E(i+1,j) &= \max\{(0, H(i,j)-\mathrm{gapoe}, E(i,j)-\mathrm{gape})\} \\
+F(i,j+1) &= \max\{(0, H(i,j)-\mathrm{gapoe}, F(i,j)-\mathrm{gape})\}
 \end{aligned}
 $$
