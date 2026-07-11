@@ -65,26 +65,21 @@ int ksw_gg(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *ta
 typedef struct { int32_t h, e; } eh_t; 
 ```
 
-* 用 $eh_t.h$ 存储 $H(i)(j-1)$, $eh_t.e$ 存储 $E(i+1)(j)$
+* 用 $eh\_t.h$ 存储 $H(i)(j-1)$, $eh\_t.e$ 存储 $E(i+1)(j)$
   由于为了节省空间，用了滚动优化，所以当遍历到下一层i时，可以从 $eh$ 中直接读取到 $H(i-1)(j-1)$ 和 $E(i)(j)$ 以便后续状态转移
 
-## Needleman-Wunsch 状态转移方程
+### 状态转移方程（NW）
 
 $$
-H(i,j) = \max \left\{ H(i-1,j-1) + S(i,j),\; E(i,j),\; F(i,j) \right\}
-$$
-
-$$
-E(i+1,j) = \max \left\{ H(i,j) - gapo,\; E(i,j) \right\} - gape = \max \left\{ H(i,j) - gapoe,\; E(i,j) - gape \right\}
-$$
-
-$$
+H(i,j) = \max \left\{ H(i-1,j-1) + S(i,j),\; E(i,j),\; F(i,j) \right\} \\
+E(i+1,j) = \max \left\{ H(i,j) - gapo,\; E(i,j) \right\} - gape = \max \left\{ H(i,j) - gapoe,\; E(i,j) - gape \right\} \\
 F(i,j+1) = \max \left\{ H(i,j) - gapo,\; F(i,j) \right\} - gape = \max \left\{ H(i,j) - gapoe,\; F(i,j) - gape \right\}
 $$
 
 ## 在 `ksw2_sw.c` 中
 
 ### 状态转移方程（SW）
+
 $$
 H(i,j) = \max \left\{ 0,\; H(i-1,j-1) + S(i,j),\; E(i,j),\; F(i,j) \right\} \\
 E(i+1,j) = \max \left\{ 0,\; H(i,j) - gapo,\; E(i,j) - gape \right\} \\
