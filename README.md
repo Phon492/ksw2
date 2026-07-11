@@ -11,7 +11,7 @@
 
 ## 改写文件介绍
 
-* `ksw2_sw.c`：基于 `ksw2_gg.c` 改写得到的标准 DP 版 SW（**！！！**已完成，但仍有以下问题：由于直接调用了全局比对的回溯函数，所以返回的 CIGAR 会呈现不完全正确的回溯信息，需要进一步修改。）
+* `ksw2_sw.c`：基于 `ksw2_gg.c` 改写得到的标准 DP 版 SW（**！！！**已完成，但仍有以下问题：由于直接调用了全局比对的回溯函数，所以返回的 CIGAR 会呈现[...]
 * `ksw2_sw2.c`：基于 `ksw2_gg2.c` 改写得到的对角线版 SW（尚未完成）
 * `ksw2_sw2_sse.c`：基于 `ksw2_gg2_sse.c` 改写得到的 SSE 向量化 SW（尚未完成）
 
@@ -19,7 +19,7 @@
 
 ## 名词解释
 
-* **匹配（match）**：两条序列在某一��匹配成功（字符相同），会得到加分奖励
+* **匹配（match）**：两条序列在某一位匹配成功（字符相同），会得到加分奖励
 * **错配（mismatch）**：两条序列在某一位匹配失败（字符不同），会得到扣分惩罚
 * **gap open**：新添加一个空位的惩罚 q（类似起步价，一般比较大）
 * **gap extension**：每再添加一个空位的惩罚 r（一般比较小）
@@ -71,11 +71,11 @@ typedef struct { int32_t h, e; } eh_t;
 
 $$
 \begin{aligned}
-H(i,j) &= \max\{H(i-1,j-1)+S(i,j),\;E(i,j),\;F(i,j)\} \\
-E(i+1,j) &= \max\{H(i,j)-\mathrm{gapo},\;E(i,j)\} - \mathrm{gape} \\
-         &= \max\{H(i,j)-\mathrm{gapoe},\;E(i,j)-\mathrm{gape}\} \\
-F(i,j+1) &= \max\{H(i,j)-\mathrm{gapo},\;F(i,j)\} - \mathrm{gape} \\
-         &= \max\{H(i,j)-\mathrm{gapoe},\;F(i,j)-\mathrm{gape}\}
+H(i,j) &= \max\{H(i-1,j-1)+S(i,j), E(i,j), F(i,j)\} \\
+E(i+1,j) &= \max\{H(i,j)-\mathrm{gapo}, E(i,j)\} - \mathrm{gape} \\
+         &= \max\{H(i,j)-\mathrm{gapoe}, E(i,j)-\mathrm{gape}\} \\
+F(i,j+1) &= \max\{H(i,j)-\mathrm{gapo}, F(i,j)\} - \mathrm{gape} \\
+         &= \max\{H(i,j)-\mathrm{gapoe}, F(i,j)-\mathrm{gape}\}
 \end{aligned}
 $$
 
@@ -85,8 +85,8 @@ $$
 
 $$
 \begin{aligned}
-H(i,j) &= \max\{0,\;H(i-1,j-1)+S(i,j),\;E(i,j),\;F(i,j)\} \\
-E(i+1,j) &= \max\{0,\;H(i,j)-\mathrm{gapo},\;E(i,j)-\mathrm{gape}\} \\
-F(i,j+1) &= \max\{0,\;H(i,j)-\mathrm{gapo},\;F(i,j)-\mathrm{gape}\}
+H(i,j) &= \max\{0, H(i-1,j-1)+S(i,j), E(i,j), F(i,j)\} \\
+E(i+1,j) &= \max\{0, H(i,j)-\mathrm{gapo}, E(i,j)-\mathrm{gape}\} \\
+F(i,j+1) &= \max\{0, H(i,j)-\mathrm{gapo}, F(i,j)-\mathrm{gape}\}
 \end{aligned}
 $$
