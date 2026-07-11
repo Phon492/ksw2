@@ -70,9 +70,13 @@ typedef struct { int32_t h, e; } eh_t;
 ### 状态转移方程（NW）
 
 $$
-H(i,j) = \max \left\{ H(i-1,j-1) + S(i,j),\; E(i,j),\; F(i,j) \right\} \\
-E(i+1,j) = \max \left\{ H(i,j) - gapo,\; E(i,j) \right\} - gape = \max \left\{ H(i,j) - gapoe,\; E(i,j) - gape \right\} \\
-F(i,j+1) = \max \left\{ H(i,j) - gapo,\; F(i,j) \right\} - gape = \max \left\{ H(i,j) - gapoe,\; F(i,j) - gape \right\}
+\begin{aligned}
+H(i,j) &= \max\{H(i-1,j-1)+S(i,j),\;E(i,j),\;F(i,j)\} \\
+E(i+1,j) &= \max\{H(i,j)-\mathrm{gapo},\;E(i,j)\} - \mathrm{gape} \\
+         &= \max\{H(i,j)-\mathrm{gapoe},\;E(i,j)-\mathrm{gape}\} \\
+F(i,j+1) &= \max\{H(i,j)-\mathrm{gapo},\;F(i,j)\} - \mathrm{gape} \\
+         &= \max\{H(i,j)-\mathrm{gapoe},\;F(i,j)-\mathrm{gape}\}
+\end{aligned}
 $$
 
 ## 在 `ksw2_sw.c` 中
@@ -80,7 +84,9 @@ $$
 ### 状态转移方程（SW）
 
 $$
-H(i,j) = \max \left\{ 0,\; H(i-1,j-1) + S(i,j),\; E(i,j),\; F(i,j) \right\} \\
-E(i+1,j) = \max \left\{ 0,\; H(i,j) - gapo,\; E(i,j) - gape \right\} \\
-F(i,j+1) = \max \left\{ 0,\; H(i,j) - gapo,\; F(i,j) - gape \right\}
+\begin{aligned}
+H(i,j) &= \max\{0,\;H(i-1,j-1)+S(i,j),\;E(i,j),\;F(i,j)\} \\
+E(i+1,j) &= \max\{0,\;H(i,j)-\mathrm{gapo},\;E(i,j)-\mathrm{gape}\} \\
+F(i,j+1) &= \max\{0,\;H(i,j)-\mathrm{gapo},\;F(i,j)-\mathrm{gape}\}
+\end{aligned}
 $$
