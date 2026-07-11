@@ -1,7 +1,7 @@
 # ksw2
 
 记录了对双序列比对的学习，主要是参照原作者的代码风格，实现对从 NW 到 SW 的改写。 
-学习对象：https://github.com/lh3/ksw2
+学习对象：https://github.com/lh3/ksw2 
 
 ## 引用文件介绍
 
@@ -15,6 +15,8 @@
 * `ksw2_sw.c`：基于 `ksw2_gg.c` 改写得到的标准 DP 版 SW（**！！！**已完成，但仍有以下问题：由于直接调用了全局比对的回溯函数，所以返回的 CIGAR 会呈现出从最优分数位置到（0，0）起点，目前尚未解决**！！！**）
 * `ksw2_sw2.c`：基于 `ksw2_gg2.c` 改写得到的对角线版 SW（尚未完成）
 * `ksw2_sw2_sse.c`：基于 `ksw2_gg2_sse.c` 改写得到的 SSE 向量化 SW（尚未完成）
+
+（以下内容是自己的一些理解）
 
 ## 名词解释
 
@@ -61,18 +63,17 @@ int ksw_gg(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *ta
 
 ```c
 typedef struct { int32_t h, e; } eh_t; 
-用 eh_t.h 存储 H(i)(j-1), eh_t.e 存储 E(i+1)(j)
-由于节省空间，用了滚动优化，所以当遍历到下一层i时，可以从eh中直接读取到 H(i-1)(j-1) 和 E(i)(j)
 ```
+
+* 用 $eh\_t.h$ 存储 $H(i)(j-1)$, $eh\_t.e$ 存储 $E(i+1)(j)$
+  由于为了节省空间，用了滚动优化，所以当遍历到下一层i时，可以从 $eh$ 中直接读取到 $H(i-1)(j-1)$ 和 $E(i)(j)$ 以便后续状态转移
 
 ### 状态转移方程（NW）
 
 $$
-\begin{aligned}
-H(i,j) &= \max\{ H(i-1,j-1) + S(i,j), \; E(i,j), \; F(i,j) \} \\[6pt]
-E(i+1,j) &= \max\{ H(i,j) - gapo, \; E(i,j) \} - gape = \max\{ H(i,j) - gapoe, \; E(i,j) - gape \} \\[6pt]
-F(i,j+1) &= \max\{ H(i,j) - gapo, \; F(i,j) \} - gape = \max\{ H(i,j) - gapoe, \; F(i,j) - gape \}
-\end{aligned}
+H(i,j) = \max \left\{ H(i-1,j-1) + S(i,j),\; E(i,j),\; F(i,j) \right\} \\
+E(i+1,j) = \max \left\{ H(i,j) - gapo,\; E(i,j) \right\} - gape = \max \left\{ H(i,j) - gapoe,\; E(i,j) - gape \right\} \\
+F(i,j+1) = \max \left\{ H(i,j) - gapo,\; F(i,j) \right\} - gape = \max \left\{ H(i,j) - gapoe,\; F(i,j) - gape \right\}
 $$
 
 ## 在 `ksw2_sw.c` 中
@@ -80,5 +81,7 @@ $$
 ### 状态转移方程（SW）
 
 $$
-H(i, j) = \max \begin{cases} 0 \\ H(i-1, j-1) + S(i, j) \\ E(i, j) \\ F(i, j) \end{cases} \\ E(i+1, j) = \max \{ 0, \ H(i, j) - gapoe, \ E(i, j) - gape \} \\ F(i, j+1) = \max \{ 0, \ H(i, j) - gapoe, \ F(i, j) - gape \}
+H(i,j) = \max \left\{ 0,\; H(i-1,j-1) + S(i,j),\; E(i,j),\; F(i,j) \right\} \\
+E(i+1,j) = \max \left\{ 0,\; H(i,j) - gapo,\; E(i,j) - gape \right\} \\
+F(i,j+1) = \max \left\{ 0,\; H(i,j) - gapo,\; F(i,j) - gape \right\}
 $$
