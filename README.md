@@ -11,7 +11,7 @@
 
 ## 改写文件介绍
 
-* `ksw2_sw.c`：基于 `ksw2_gg.c` 改写得到的标准 DP 版 SW（**！！！**已完成，但仍有以下问题：由于直接调用了全局比对的回溯函数，所以返回的 CIGAR 会呈现出从最优分数位置到（0，0）起点，目前尚未解决**！！！**）
+* `ksw2_sw.c`：基于 `ksw2_gg.c` 改写得到的标准 DP 版 SW（**！！！**已完成，但仍有以下问题：由于直接调用了全局比对的回溯函数，所以返回的 CIGAR 会呈现不完全正确的回溯信息，需要进一步修改。）
 * `ksw2_sw2.c`：基于 `ksw2_gg2.c` 改写得到的对角线版 SW（尚未完成）
 * `ksw2_sw2_sse.c`：基于 `ksw2_gg2_sse.c` 改写得到的 SSE 向量化 SW（尚未完成）
 
@@ -19,14 +19,14 @@
 
 ## 名词解释
 
-* **匹配（match）**：两条序列在某一位匹配成功（字符相同），会得到加分奖励
+* **匹配（match）**：两条序列在某一��匹配成功（字符相同），会得到加分奖励
 * **错配（mismatch）**：两条序列在某一位匹配失败（字符不同），会得到扣分惩罚
 * **gap open**：新添加一个空位的惩罚 q（类似起步价，一般比较大）
 * **gap extension**：每再添加一个空位的惩罚 r（一般比较小）
 * **全局比对（global alignment）**：比较两条完整的序列
 * **局部比对（local alignment）**：比较两条序列的某一片段
 * **traceback**：回溯，在完成 DP 后，通过终点进行回溯到原点，可以得到一个最优添加空位的序列方案
-* **CIGAR**：通过字符串记录回溯得到的序列（如 6M2I2M），M（match/mismatch）比对的字符、I（insertion）target 插入的空格、D（deletion）query插入的空格，矩阵中纵轴 i 表示 target，横轴 j 表示 Query，回溯的时候往上走就多个 D，往左走就多个 I。用这个 CIGAR 字符串来看参考序列，就可以知道在查询序列相对于参考序列发生了哪些变化。如果是以 Target 为标准，Query 在这里多长了字符，CIGAR 就记为 I；Query 在这里多加了空位，CIGAR 就记为 D。
+* **CIGAR**：通过字符串记录回溯得到的序列（如 6M2I2M），M（match/mismatch）比对的字符、I（insertion）target 插入的空格、D（deletion）query 插入的空格，矩阵或回溯描述等信息可以由该字符串表示。
 
 ------
 
@@ -54,9 +54,9 @@ int ksw_gg(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *ta
 
 | 状态      | 物理意义                                                     | 视觉表现            | 状态转移（外层 $i$ 代表 Target 字符，内层 $j$ 代表 Query 字符） |
 | --------- | ------------------------------------------------------------ | ------------------- | ------------------------------------------------------------ |
-| $H(i, j)$ | **主状态 (Match / Mismatch) ；**当前 Target 字符与 Query 字符强行对齐的最优评分。 | Target: A Query: A  | 必须从**左上角对角线** $(i-1, j-1)$ 转移过来，加上当前碱基对齐的打分。 |
-| $E(i, j)$ | **水平空位状态 (Insertion)；**相对于 Target 来说，Query 插入了字符，Target 插入空位。 | Target: - Query: A  | 必须从**左边格子** $(i, j-1)$ 转移过来。意味着在横向移动，持续往 Target 里灌空位。 |
-| $F(i, j)$ | **垂直空位状态 (Deletion)；**相对于 Target 来说，Query 缺失了字符，Query 插入空位。 | Target: A Query:  - | 必须从**上边格子** $(i-1, j)$ 转移过来。意味着在纵向移动，持续往 Query 里灌空位。 |
+| $H(i, j)$ | **主状态 (Match / Mismatch) ；**当前 Target 字符与 Query 字符强行对齐的最优评分。 | Target: A Query: A  | 必须从**左上角对角线** $(i-1, j-1)$ 转移过来                         |
+| $E(i, j)$ | **水平空位状态 (Insertion)；**相对于 Target 来说，Query 插入了字符，Target 插入空位。 | Target: - Query: A  | 必须从**左边格子** $(i, j-1)$ 转移过来                                     |
+| $F(i, j)$ | **垂直空位状态 (Deletion)；**相对于 Target 来说，Query 缺失了字符，Query 插入空位。 | Target: A Query:  - | 必须从**上边格子** $(i-1, j)$ 转移过来                                     |
 
 ### 结构体定义：
 
