@@ -18,14 +18,14 @@
 
 ## 名词解释
 
-* 匹配（match）：两条序列在某一位匹配成功（字符相同），会得到加分奖励
-* 错配（mismatch）：两条序列在某一位匹配失败（字符不同），会得到扣分惩罚
-* gap open：新添加一个空位的惩罚 q（类似起步价，一般比较大）
-* gap extension：每再添加一个空位的惩罚 r（一般比较小）
-* 全局比对（global alignment）：比较两条完整的序列
-* 局部比对（local alignment）：比较两条序列的某一片段
-* traceback：回溯，在完成DP后，通过终点进行回溯到原点，可以得到一个最优添加空位的序列方案
-* CIGAR：通过字符串记录回溯得到的序列（如 6M2I2M），M（match/mismatch）比对的字符、I（insertion）target 插入的空格、D（deletion）query插入的空格，矩阵中纵轴 i 表示 target，横轴 j 表示 Query，回溯的时候往上走就多个 D，往左走就多个 I。用这个 CIGAR 字符串来看参考序列，就可以知道在查询序列相对于参考序列发生了哪些变化。如果是以 Target 为标准，Query 在这里多长了字符，CIGAR 就记为 I；Query 在这里多加了空位，CIGAR 就记为 D。
+* **匹配（match）**：两条序列在某一位匹配成功（字符相同），会得到加分奖励
+* **错配（mismatch）**：两条序列在某一位匹配失败（字符不同），会得到扣分惩罚
+* **gap open**：新添加一个空位的惩罚 q（类似起步价，一般比较大）
+* **gap extension**：每再添加一个空位的惩罚 r（一般比较小）
+* **全局比对（global alignment）**：比较两条完整的序列
+* **局部比对（local alignment）**：比较两条序列的某一片段
+* **traceback**：回溯，在完成DP后，通过终点进行回溯到原点，可以得到一个最优添加空位的序列方案
+* **CIGAR**：通过字符串记录回溯得到的序列（如 6M2I2M），M（match/mismatch）比对的字符、I（insertion）target 插入的空格、D（deletion）query插入的空格，矩阵中纵轴 i 表示 target，横轴 j 表示 Query，回溯的时候往上走就多个 D，往左走就多个 I。用这个 CIGAR 字符串来看参考序列，就可以知道在查询序列相对于参考序列发生了哪些变化。如果是以 Target 为标准，Query 在这里多长了字符，CIGAR 就记为 I；Query 在这里多加了空位，CIGAR 就记为 D。
 
 ------
 
