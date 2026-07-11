@@ -1,24 +1,31 @@
 # ksw2
-记录了对双序列比对的学习，主要是参照原作者的代码风格，实现对从 NW 到 SW 的改写。 \\
+
+记录了对双序列比对的学习，主要是参照原作者的代码风格，实现对从 NW 到 SW 的改写。 
 学习对象：https://github.com/lh3/ksw2
+
+## 引用文件介绍
+
+* `ksw2.h`：头文件，包含主要数据结构与接口声明。
+* `ksw2_gg.c`：全局比对；Green 的标准 DP 形式。
+* `ksw2_gg2.c`：全局比对；Suzuki 的对角线形式。
+* `ksw2_gg2_sse.c`：全局比对；基于 SSE intrinsics 的 Suzuki 对角线向量化实现。
+
+## 改写文件介绍
+
+* `ksw2_sw.c`：基于 `ksw2_gg.c` 改写得到的标准 DP 版 SW
+* `ksw2_sw2.c`：基于 `ksw2_gg2.c` 改写得到的对角线版 SW
+* `ksw2_sw2_sse.c`：基于 `ksw2_gg2_sse.c` 改写得到的 SSE 向量化 SW
 
 ## 名词解释
 
-匹配（match）：两条序列在某一位匹配成功（字符相同），会得到加分奖励
-
-错配（mismatch）：两条序列在某一位匹配失败（字符不同），会得到扣分惩罚
-
-gap open：新添加一个空位的惩罚 q（类似起步价，一般比较大）
-
-gap extension：每再添加一个空位的惩罚 r（一般比较小）
-
-全局比对（global alignment）：比较两条完整的序列
-
-局部比对（local alignment）：比较两条序列的某一片段
-
-traceback ：回溯，在完成DP后，通过终点进行回溯到原点，可以得到一个最优添加空位的序列方案
-
-CIGAR：通过字符串记录回溯得到的序列（如 6M2I2M），M（match/mismatch）比对的字符、I（insertion）target 插入的空格、D（deletion）query插入的空格，矩阵中纵轴 i 表示 target，横轴 j 表示 Query，回溯的时候往上走就多个 D，往左走就多个 I。用这个 CIGAR 字符串来看参考序列，就可以知道在查询序列相对于参考序列发生了哪些变化。如果是以 Target 为标准，Query 在这里多长了字符，CIGAR 就记为 I；Query 在这里多加了空位，CIGAR 就记为 D。
+* 匹配（match）：两条序列在某一位匹配成功（字符相同），会得到加分奖励
+* 错配（mismatch）：两条序列在某一位匹配失败（字符不同），会得到扣分惩罚
+* gap open：新添加一个空位的惩罚 q（类似起步价，一般比较大）
+* gap extension：每再添加一个空位的惩罚 r（一般比较小）
+* 全局比对（global alignment）：比较两条完整的序列
+* 局部比对（local alignment）：比较两条序列的某一片段
+* traceback：回溯，在完成DP后，通过终点进行回溯到原点，可以得到一个最优添加空位的序列方案
+* CIGAR：通过字符串记录回溯得到的序列（如 6M2I2M），M（match/mismatch）比对的字符、I（insertion）target 插入的空格、D（deletion）query插入的空格，矩阵中纵轴 i 表示 target，横轴 j 表示 Query，回溯的时候往上走就多个 D，往左走就多个 I。用这个 CIGAR 字符串来看参考序列，就可以知道在查询序列相对于参考序列发生了哪些变化。如果是以 Target 为标准，Query 在这里多长了字符，CIGAR 就记为 I；Query 在这里多加了空位，CIGAR 就记为 D。
 
 ------
 
@@ -68,10 +75,10 @@ F(i,j+1) &= \max\{ H(i,j) - gapo, \; F(i,j) \} - gape = \max\{ H(i,j) - gapoe, \
 \end{aligned}
 $$
 
-### 状态转移方程（W）
+## 在 `ksw2_sw.c` 中
+
+### 状态转移方程（SW）
 
 $$
 H(i, j) = \max \begin{cases} 0 \\ H(i-1, j-1) + S(i, j) \\ E(i, j) \\ F(i, j) \end{cases} \\ E(i+1, j) = \max \{ 0, \ H(i, j) - gapoe, \ E(i, j) - gape \} \\ F(i, j+1) = \max \{ 0, \ H(i, j) - gapoe, \ F(i, j) - gape \}
 $$
-
-
