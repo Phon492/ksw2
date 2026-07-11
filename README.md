@@ -54,9 +54,9 @@ int ksw_gg(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *ta
 
 | 状态      | 物理意义                                                     | 视觉表现            | 状态转移（外层 $i$ 代表 Target 字符，内层 $j$ 代表 Query 字符） |
 | --------- | ------------------------------------------------------------ | ------------------- | ------------------------------------------------------------ |
-| $H(i, j)$ | **主状态 (Match / Mismatch) ；**当前 Target 字符与 Query 字符强行对齐的最优评分。 | Target: A Query: A  | 必须从**左上角对角线** $(i-1, j-1)$ 转移过来                         |
-| $E(i, j)$ | **水平空位状态 (Insertion)；**相对于 Target 来说，Query 插入了字符，Target 插入空位。 | Target: - Query: A  | 必须从**左边格子** $(i, j-1)$ 转移过来                                     |
-| $F(i, j)$ | **垂直空位状态 (Deletion)；**相对于 Target 来说，Query 缺失了字符，Query 插入空位。 | Target: A Query:  - | 必须从**上边格子** $(i-1, j)$ 转移过来                                     |
+| $H(i, j)$ | **主状态 (Match / Mismatch)** ；当前 Target 字符与 Query 字符强行对齐的最优评分。 | Target: A Query: A  | 必须从**左上角对角线** $(i-1, j-1)$ 转移过来                         |
+| $E(i, j)$ | **水平空位状态 (Insertion)**；相对于 Target 来说，Query 插入了字符，Target 插入空位。 | Target: - Query: A  | 必须从**左边格子** $(i, j-1)$ 转移过来                                     |
+| $F(i, j)$ | **垂直空位状态 (Deletion)**；相对于 Target 来说，Query 缺失了字符，Query 插入空位。 | Target: A Query:  - | 必须从**上边格子** $(i-1, j)$ 转移过来                                     |
 
 ### 结构体定义：
 
@@ -71,7 +71,7 @@ typedef struct { int32_t h, e; } eh_t;
 
 $$
 \begin{aligned}
-H(i,j) &= \max\{H(i-1,j-1)+S(i,j), E(i,j), F(i,j)\} \\
+H(i,j) &= \max&{H(i-1,j-1)+S(i,j), E(i,j), F(i,j)&} \\
 E(i+1,j) &= \max\{H(i,j)-\mathrm{gapo}, E(i,j)\} - \mathrm{gape} \\
          &= \max\{H(i,j)-\mathrm{gapoe}, E(i,j)-\mathrm{gape}\} \\
 F(i,j+1) &= \max\{H(i,j)-\mathrm{gapo}, F(i,j)\} - \mathrm{gape} \\
