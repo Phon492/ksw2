@@ -1,2 +1,2 @@
 # ksw2
-Learning pairwise sequence alignment — implementation and practice.
+记录了对双序列比对的学习，主要是对 NW 到 SW 的改写
