@@ -11,7 +11,6 @@ static inline void ksw_sw_backtrack(void *km, int is_rot, int is_rev, int min_in
 	uint32_t *cigar = *cigar_, tmp;
 	while (i >= 0 && j >= 0) { 
 		int force_state = -1;
-		uint8_t tmp;
 		if (is_rot) {
 			r = i + j;
 			if (i < off[r]) force_state = 2;
