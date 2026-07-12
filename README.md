@@ -113,4 +113,4 @@ $$
 * 得 $v_{r,t}=z_{r,t}-u_{r-1,t}$ 
 * 得 $x_{r,t}=\max\{(0,x_{r-1,t-1}+v_{r-1,t-1}-z_{r,t}+q)\}$ 
 * 得 $y_{r.t}=\max\{(0,y_{r-1,t}+u_{r-1,t}-z_{r,t}+q)\}$ 
-* 可知 $0\le r\le qlen + tlen-2$  与 $\max\left\{0,r-qlen+1,\frac{r-w}{2}\right\}\le t\le\min\left\{tlen-1,r,\frac{r+w}{2}\right\}$ 
+* 可知 $0\le r\le qlen + tlen-2$  与 $\max\le \{(0,r-qlen+1,\frac{r-w}{2})\}\le t\le\min\{(tlen-1,r,\frac{r+w}{2})\}$ 
