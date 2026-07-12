@@ -22,7 +22,7 @@ static inline void ksw_sw_backtrack(void *km, int is_rot, int is_rev, int min_in
 			if (off_end && j > off_end[i]) force_state = 1;
 			tmp = force_state < 0? p[(size_t)i * n_col + j - off[i]] : 0;
 		}
-		if (tmp == 0xff) break;
+		if (tmp == 4) break;  // 添加了跳出回溯的状态
 		if (state == 0) state = tmp & 7; 
 		else if (!(tmp >> (state + 2) & 1)) state = 0; 
 		if (state == 0) state = tmp & 7;
@@ -32,6 +32,7 @@ static inline void ksw_sw_backtrack(void *km, int is_rot, int is_rev, int min_in
 		else if (state == 3 && min_intron_len > 0) cigar = ksw_push_cigar(km, &n_cigar, &m_cigar, cigar, KSW_CIGAR_N_SKIP, 1), --i;
 		else cigar = ksw_push_cigar(km, &n_cigar, &m_cigar, cigar, KSW_CIGAR_INS, 1), --j;
 	}
+	// 删去了跑到边界的步骤，从全局比对变为局部比对
 	if (!is_rev)
 		for (i = 0; i < n_cigar>>1; ++i) 
 			tmp = cigar[i], cigar[i] = cigar[n_cigar-1-i], cigar[n_cigar-1-i] = tmp;
