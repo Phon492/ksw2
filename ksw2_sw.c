@@ -1,6 +1,6 @@
 #include <stdio.h>
-#include <ksw2.h>
-
+#include "ksw2.h"
+#include "ksw_sw_backtrack.h"
 typedef struct { int32_t h, e; } eh_t; 
 
 int ksw_sw(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *target, int8_t m, const int8_t *mat, int8_t gapo, int8_t gape, int w, int *m_cigar_, int *n_cigar_, uint32_t **cigar_)
@@ -108,7 +108,7 @@ int ksw_sw(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *ta
 	}
 	kfree(km, qp); kfree(km, eh);
 	if (m_cigar_ && n_cigar_ && cigar_) {
-		ksw_backtrack(km, 0, 0, 0, z, off, 0, n_col, end_t, end_q, m_cigar_, n_cigar_, cigar_);
+		ksw_sw_backtrack(km, 0, 0, 0, z, off, 0, n_col, end_t, end_q, m_cigar_, n_cigar_, cigar_);
 		kfree(km, z);
 		kfree(km, off);
 	}
