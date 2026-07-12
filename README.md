@@ -98,11 +98,11 @@ $$
 * 令 $v_{i,j}=H_{i,j}-H_{i,j-1}+ qe$  （水平差分+偏移量）
 * 令 $x_{i,j}=E_{i+1,j}-H_{i,j}+ qe$
 * 令 $y_{i,j}=F_{i,j+1}-H_{i,j}+ qe$
-* 得 $z_{i,j} = H_{i,j} - H_{i-1,j-1} + 2qe = \max\{S_{i,j}+2qe, \; x_{i-1,j}+v_{i-1,j}, \; y_{i,j-1}+u_{i,j-1} \}$  （对角线差分+偏移量）
+* 得 $z_{i,j} = H_{i,j} - H_{i-1,j-1} + 2qe = \max\{(S_{i,j}+2qe,  x_{i-1,j}+v_{i-1,j},  y_{i,j-1}+u_{i,j-1}) \}$  （对角线差分+偏移量）
 * 得 $u_{i,j}=z_{i,j}-v_{i-1,j}$ 
 * 得 $v_{i,j}=z_{i,j}-u_{i,j-1}$ 
-* 得 $x_{i,j}=\max\{0,\;x_{i-1,j}-u_{i,j}+q\}=\max\{0,\;x_{i-1,j}+v_{i-1,j}-z_{i,j}+q\}$ 
-* 得 $y_{i,j}=\max\{0,\;y_{i,j-1}-v_{i,j}+q\}=\max\{0,\;y_{i,j-1}+u_{i,j-1}-z_{i,j}+q\}$ 
+* 得 $x_{i,j}=\max\{(0,x_{i-1,j}-u_{i,j}+q)\}=\max\{(0,x_{i-1,j}+v_{i-1,j}-z_{i,j}+q)\}$ 
+* 得 $y_{i,j}=\max\{(0,y_{i,j-1}-v_{i,j}+q)\}=\max\{(0,y_{i,j-1}+u_{i,j-1}-z_{i,j}+q)\}$ 
 * 通过偏移量，保证了每个变量的非负性 
 
 #### 仿射变换
@@ -111,6 +111,6 @@ $$
 * 得 $z_{r,t}=\max\{S(t,r-t)+2qe,\;x_{r-1,t-1}+v_{r-1,t-1},\;y_{r-1,t}+u_{r-1,t}\}$ 
 * 得 $u_{r,t}=z_{r,t}-v_{r-1,t-1}$ 
 * 得 $v_{r,t}=z_{r,t}-u_{r-1,t}$ 
-* 得 $x_{r,t}=\max\{0,\;x_{r-1,t-1}+v_{r-1,t-1}-z_{r,t}+q\}$ 
-* 得 $y_{r.t}=\max\{0,\;y_{r-1,t}+u_{r-1,t}-z_{r,t}+q\}$ 
+* 得 $x_{r,t}=\max\{(0,x_{r-1,t-1}+v_{r-1,t-1}-z_{r,t}+q)\}$ 
+* 得 $y_{r.t}=\max\{(0,y_{r-1,t}+u_{r-1,t}-z_{r,t}+q)\}$ 
 * 可知 $0\le r\le qlen + tlen-2$  与 $\max\left\{0,r-qlen+1,\frac{r-w}{2}\right\}\le t\le\min\left\{tlen-1,r,\frac{r+w}{2}\right\}$ 
