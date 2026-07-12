@@ -11,7 +11,7 @@
 
 ## 改写文件介绍
 
-* `ksw2_sw.c`：基于 `ksw2_gg.c` 改写得到的标准 DP 版 SW（已完成）
+* `ksw2_sw.c`：基于 `ksw2_gg.c` 改写得到的标准 DP 版 SW
 * `ksw2_sw2.c`：基于 `ksw2_gg2.c` 改写得到的对角线版 SW（尚未完成）
 * `ksw2_sw2_sse.c`：基于 `ksw2_gg2_sse.c` 改写得到的 SSE 向量化 SW（尚未完成）
 * `ksw_sw_traceback.h`：基于 `ksw2.h` 中 **ksw_backtrack** 函数，重写了属于 SW 的回溯函数
