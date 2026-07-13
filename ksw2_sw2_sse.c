@@ -34,7 +34,7 @@ int ksw_sw2_sse(void *km, int qlen, const uint8_t *query, int tlen, const uint8_
 	n_col = n_col_ * 16;
 
 	mem = (uint8_t*)kcalloc(km, tlen_ * 5 + 1, 16);
-	u = (__m128i*)(((size_t)mem + 15) >> 4 << 4); 
+	u = (__m128i*)(((size_t)mem + 15) >> 4 << 4); // 16 字节对齐的位运算技巧
 	v = u + tlen_, x = v + tlen_, y = x + tlen_, s = y + tlen_;
 	qr = (uint8_t*)kcalloc(km, qlen, 1);
 	mem2 = (uint8_t*)kmalloc(km, ((size_t)(qlen + tlen - 1) * n_col_ + 1) * 16);
@@ -79,7 +79,7 @@ int ksw_sw2_sse(void *km, int qlen, const uint8_t *query, int tlen, const uint8_
             __m128i d, z, a, b, xt1, vt1, ut, tmp;
             int base = t << 4;   // 当前块对应的起始 t 索引
 
-            // SW：z 从 0 开始（允许重新开始
+            // SW：z 从 0 开始（允许重新开始）
             z = zero_;
 
             // s_val = S + 2q + 2e
@@ -103,9 +103,7 @@ int ksw_sw2_sse(void *km, int qlen, const uint8_t *query, int tlen, const uint8_
             b = _mm_add_epi8(_mm_load_si128(&y[t]), ut);
 
             // SW：z = max(0, s_val, a, b)
-
             d = _mm_set1_epi8(0xff);  
-
             // 比较 s_val 与 z（z 初始为 0）
             __m128i mask_s = _mm_cmpgt_epi8(s_val, z);
 #ifdef __SSE4_1__
@@ -116,7 +114,6 @@ int ksw_sw2_sse(void *km, int qlen, const uint8_t *query, int tlen, const uint8_
             d = _mm_or_si128(_mm_andnot_si128(mask_s, d),
                              _mm_and_si128(mask_s, _mm_set1_epi8(0)));
 #endif
-
             // a 与 z
             __m128i mask_a = _mm_cmpgt_epi8(a, z);
 #ifdef __SSE4_1__
@@ -127,7 +124,6 @@ int ksw_sw2_sse(void *km, int qlen, const uint8_t *query, int tlen, const uint8_
             d = _mm_or_si128(_mm_andnot_si128(mask_a, d),
                              _mm_and_si128(mask_a, _mm_set1_epi8(1)));
 #endif
-
             // 比较 b 与 z
             __m128i mask_b = _mm_cmpgt_epi8(b, z);
 #ifdef __SSE4_1__
@@ -144,6 +140,7 @@ int ksw_sw2_sse(void *km, int qlen, const uint8_t *query, int tlen, const uint8_
             _mm_store_si128(&v[t], _mm_sub_epi8(z, ut));
 
             // 更新 x 和 y，并设置延续位
+            // x = max(0, a - z + q)，y = max(0, b - z + q)
             z = _mm_sub_epi8(z, q_);
             a = _mm_sub_epi8(a, z);
             b = _mm_sub_epi8(b, z);
