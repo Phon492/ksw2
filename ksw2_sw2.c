@@ -136,7 +136,7 @@ int ksw_sw2(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *t
                     h = H1[t] - qe > h? H1[t] - qe : h;
                 }
                 if (t - 1 >= 0) {
-                    h = H0[t - 1] - qe > h? H1[t - 1] - qe : h;
+                    h = H1[t - 1] - qe > h? H1[t - 1] - qe : h;
                 }
 
 				if (h > max_score) {
