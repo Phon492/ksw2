@@ -176,9 +176,9 @@ int ksw_sw2_sse(void *km, int qlen, const uint8_t *query, int tlen, const uint8_
                     h = del_val > h? del_val : h;
                 }
 
-                // 插入: H(r,t) = H(r, t-1) - q - e
+                // 插入: H(r,t) = H(r-1, t-1) - q - e
                 if (tt > 0) {
-                    int32_t ins_val = H0[tt - 1] - (q + e);
+                    int32_t ins_val = H1[tt - 1] - (q + e);
                     h = ins_val > h? ins_val : h;
                 }
 
