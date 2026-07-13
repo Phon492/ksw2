@@ -78,8 +78,6 @@ int ksw_sw2(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *t
 				H0[t] = h;
 
 				uint8_t d;
-				if(h == 0) d = 0xff;
-				
 				int8_t u1;
 				int8_t z = s[t] + qe2;
 				int8_t a = x1   + v1;
@@ -103,6 +101,8 @@ int ksw_sw2(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *t
 				x[t] = a > 0? a    : 0;
 				d   |= b > 0? 0x10 : 0;
 				y[t] = b > 0? b    : 0; 
+
+				if(h == 0) d = 0xff;
 				pr[t - st] = d;
 			}
 			int32_t *tmp = H2;
@@ -112,17 +112,14 @@ int ksw_sw2(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *t
 		} else {
 			for (t = st; t <= en; ++t) {
 				int32_t h = 0;
-				// 匹配：H(r,t) = H(r-2, t-1) + S(i,j)
 				if (t - 1 >= 0 && (t - 1) >= ((r - 2) - qlen + 1)) {  
 					h = H2[t - 1] + s[t] > h ? H2[t - 1] + s[t] : h;
 				}
-                // 删除：H(r,t) = H(r-1, t) - q - e
                 if (H1[t] >= 0) {
-                    h = H1[t] - q - e > h? H1[t] - qe : h;
+                    h = H1[t] - qe > h? H1[t] - qe : h;
                 }
-                // 插入：H(r,t) = H(r, t-1) - q - e
                 if (t - 1 >= 0) {
-                    h = H0[t - 1] - q - e > h? H0[t - 1] - qe : h;
+                    h = H0[t - 1] - qe > h? H0[t - 1] - qe : h;
                 }
 
 				if (h > max_score) {
@@ -132,24 +129,6 @@ int ksw_sw2(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *t
 				}
 
 				H0[t] = h;
-
-				int8_t u1;
-				int8_t z = s[t] + qe2;
-				int8_t a = x1   + v1;
-				int8_t b = y[t] + u[t];
-				z = a > z? a : z;
-				z = b > z? b : z;
-				
-				u1 = u[t];            
-				u[t] = z - v1;     
-				v1 = v[t];            
-				v[t] = z - u1;       
-				z -= q;
-				a -= z;
-				b -= z;
-				x1 = x[t];           
-				x[t] = a > 0? a    : 0;
-				y[t] = b > 0? b    : 0; 
 			}
 			int32_t *tmp = H2;
 			H2 = H1;
