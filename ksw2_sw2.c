@@ -59,11 +59,17 @@ int ksw_sw2(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *t
 				uint8_t d;
 				// 匹配：H(r,t) = H(r-2, t-1) + S(i,j)
 				if (t - 1 >= 0 && (t - 1) >= ((r - 2) - qlen + 1)) {  // r - qlen + 1 <= t <= r; t <- t-1, r <- r-2
-			        int32_t match_val = H2[t - 1] + s[t];
+			        int32_t match_val = H2[t - 1] + s[t];;
 			        if (match_val > h) {
 			            h = match_val;
 			            d = 0;
-			        }
+			        }				        
+				} else {
+					int32_t match_val = s[t];
+			        if (match_val > h) {
+			            h = match_val;
+			            d = 0;
+			        }					
 				}
                 // 删除：H(r,t) = H(r-1, t) - q - e
                 if (H1[t] >= 0) {
@@ -124,6 +130,8 @@ int ksw_sw2(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *t
 				int32_t h = 0;
 				if (t - 1 >= 0 && (t - 1) >= ((r - 2) - qlen + 1)) {  
 					h = H2[t - 1] + s[t] > h ? H2[t - 1] + s[t] : h;
+				} else {
+					h = s[t] > h ? s[t] : h;
 				}
                 if (H1[t] >= 0) {
                     h = H1[t] - qe > h? H1[t] - qe : h;
