@@ -56,17 +56,30 @@ int ksw_sw2(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *t
 			off[r] = st;
 			for (t = st; t <= en; ++t) {
 				int32_t h = 0;
+				uint8_t d;
 				// 匹配：H(r,t) = H(r-2, t-1) + S(i,j)
 				if (t - 1 >= 0 && (t - 1) >= ((r - 2) - qlen + 1)) {  // r - qlen + 1 <= t <= r; t <- t-1, r <- r-2
-					h = H2[t - 1] + s[t] > h ? H2[t - 1] + s[t] : h;
+			        int32_t match_val = H2[t - 1] + s[t];
+			        if (match_val > h) {
+			            h = match_val;
+			            d = 0;
+			        }
 				}
                 // 删除：H(r,t) = H(r-1, t) - q - e
                 if (H1[t] >= 0) {
-                    h = H1[t] - q - e > h? H1[t] - qe : h;
+			        int32_t del_val = H1[t] - q - e;
+			        if (del_val > h) {
+			            h = del_val;
+			            d = 1;  // 方向：删除
+			        }
                 }
                 // 插入：H(r,t) = H(r, t-1) - q - e
                 if (t - 1 >= 0) {
-                    h = H0[t - 1] - q - e > h? H0[t - 1] - qe : h;
+			        int32_t ins_val = H0[t - 1] - q - e;
+			        if (ins_val > h) {
+			            h = ins_val;
+			            d = 2;  // 方向：插入
+			        }
                 }
 
 				if (h > max_score) {
@@ -77,26 +90,23 @@ int ksw_sw2(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *t
 
 				H0[t] = h;
 
-				uint8_t d;
 				int8_t u1;
 				int8_t z = s[t] + qe2;
 				int8_t a = x1   + v1;
 				int8_t b = y[t] + u[t];
-				d = a > z? 1 : 0; 
 				z = a > z? a : z;
-				d = b > z? 2 : d;
 				z = b > z? b : z;
-
-				d = z > 0? d : 0xff;
 				
 				u1 = u[t];            
 				u[t] = z - v1;     
 				v1 = v[t];            
-				v[t] = z - u1;       
+				v[t] = z - u1; 
+
 				z -= q;
 				a -= z;
 				b -= z;
-				x1 = x[t];           
+				x1 = x[t];   
+
 				d   |= a > 0? 0x08 : 0;
 				x[t] = a > 0? a    : 0;
 				d   |= b > 0? 0x10 : 0;
