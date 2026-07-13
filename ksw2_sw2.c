@@ -1,116 +1,167 @@
 #include <stdio.h>
 #include "ksw2.h"
 #include "ksw_sw_backtrack.h"
-typedef struct { int32_t h, e; } eh_t; 
 
-int ksw_sw(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *target, int8_t m, const int8_t *mat, int8_t gapo, int8_t gape, int w, int *m_cigar_, int *n_cigar_, uint32_t **cigar_)
+int ksw_sw2(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *target, int8_t m, const int8_t *mat, int8_t q, int8_t e, int w, int *m_cigar_, int *n_cigar_, uint32_t **cigar_)
 {
-	eh_t *eh;
-	int8_t *qp;
-	int32_t i, j, k, gapoe = gapo + gape, n_col, *off = 0;
-	uint8_t *z = 0;
+	int qe = q + e, qe2 = qe + qe, r, t, n_col, *off = 0;
+	int8_t *u, *v, *x, *y, *s;
+	uint8_t *p = 0, *qr;
+	int32_t *H0 = 0, *H1 = 0, *H2 = 0; // r, r-1, r-2
 	int max_score = 0;
-	int end_t = -1, end_q = -1;
+	int end_r = -1, end_t = -1;
 
+	u = (int8_t*)kcalloc(km, tlen + 1, 1);
+	v = (int8_t*)kcalloc(km, tlen + 1, 1);
+	x = (int8_t*)kcalloc(km, tlen + 1, 1);
+	y = (int8_t*)kcalloc(km, tlen + 1, 1);
+	s = (int8_t*)kmalloc(km, tlen);
+	qr = (uint8_t*)kmalloc(km, qlen);
 	if (w < 0) w = tlen > qlen? tlen : qlen;
-	n_col = qlen < 2*w+1? qlen : 2*w+1;
-	qp = (int8_t*)kmalloc(km, qlen * m);
-	eh = (eh_t*)kcalloc(km, qlen + 1, 8);
+	n_col = w + 1 < tlen? w + 1 : tlen;
+	H0 = (int32_t*)kcalloc(km, tlen + 1, sizeof(int32_t));
+	H1 = (int32_t*)kcalloc(km, tlen + 1, sizeof(int32_t));
+	H2 = (int32_t*)kcalloc(km, tlen + 1, sizeof(int32_t));	
+
 	if (m_cigar_ && n_cigar_ && cigar_) {
-		*n_cigar_ = 0;
-		z = (uint8_t*)kmalloc(km, (size_t)n_col * tlen);
-		off = (int32_t*)kcalloc(km, tlen, 4);
+		p = (uint8_t*)kcalloc(km, (size_t)(qlen + tlen) * n_col, 1);
+		off = (int*)kmalloc(km, (qlen + tlen) * sizeof(int));
 	}
 
-	for (k = i = 0; k < m; ++k) {
-		const int8_t *p = &mat[k * m];
-		for (j = 0; j < qlen; ++j) qp[i++] = p[query[j]];
-	}
-	
-	for (j = 0; j <= qlen; ++j) 
-		eh[j].h = 0, eh[j].e = 0;
+	for (t = 0; t < qlen; ++t)
+		qr[t] = query[qlen - 1 - t];
 
-	for (i = 0; i < tlen; ++i) {
-		int32_t f = 0, h1 = 0, st, en;
-		int8_t *q = &qp[target[i] * qlen];
-
-		st = i > w? i - w : 0;
-		en = i + w + 1 < qlen? i + w + 1 : qlen;
-
+	for (r = 0; r < qlen + tlen - 1; ++r) {
+		int st = 0, en = tlen - 1;
+		int8_t x1, v1;
+		
+		if (st < r - qlen + 1) st = r - qlen + 1;
+		if (en > r) en = r;
+		if (st < (r-w+1)>>1) st = (r-w+1)>>1; 
+		if (en > (r+w)>>1) en = (r+w)>>1; 
+		
+		if (st != 0) {
+			if (r > st + st + w - 1) x1 = v1 = 0;
+			else x1 = x[st-1], v1 = v[st-1]; 
+		} else x1 = 0, v1 = 0;
+		if (en != r) {
+			if (r < en + en - w - 1) y[en] = u[en] = 0; 
+		} else y[r] = 0, u[r] = 0;
+		
+		for (t = st; t <= en; ++t)
+			s[t] = mat[target[t] * m + qr[t + qlen - 1 - r]];
+		
 		if (m_cigar_ && n_cigar_ && cigar_) {
-			uint8_t *zi = &z[(long)i * n_col];
-			off[i] = st;
-			for (j = st; j < en; ++j){
-				eh_t *p = &eh[j];
-				int32_t h = p->h, e = p->e;
-				uint8_t d; 
-				p->h = h1;
-				h += q[j];
-
-				d = h >= e? 0 : 1;
-				h = h >= e? h : e;
-				d = h >= f? d : 2;
-				h = h >= f? h : f;
-
+			uint8_t *pr = p + (size_t)r * n_col;
+			off[r] = st;
+			for (t = st; t <= en; ++t) {
+				int32_t h = 0;
+				uint8_t d;
+				// 匹配：H(r,t) = H(r-2, t-1) + S(i,j)
+				if (t - 1 >= 0 && (t - 1) >= ((r - 2) - qlen + 1)) {  // r - qlen + 1 <= t <= r; t <- t-1, r <- r-2
+			        int32_t match_val = H2[t - 1] + s[t];
+			        if (match_val > h) {
+			            h = match_val;
+			            d = 0;
+			        }				        
+				} else {
+					int32_t match_val = s[t];
+			        if (match_val > h) {
+			            h = match_val;
+			            d = 0;
+			        }					
+				}
+                // 删除：H(r,t) = H(r-1, t) - q - e
+                if (H1[t] >= 0) {
+			        int32_t del_val = H1[t] - qe;
+			        if (del_val > h) {
+			            h = del_val;
+			            d = 1;
+			        }
+                }
+                // 插入：H(r,t) = H(r-1, t-1) - q - e
+                if (t - 1 >= 0) {
+			        int32_t ins_val = H1[t - 1] - qe;
+			        if (ins_val > h) {
+			            h = ins_val;
+			            d = 2;
+			        }
+                }                
 				if (h > max_score) {
 					max_score = h;
-					end_t = i;
-					end_q = j;
+					end_t = t;
+					end_r = r;
 				}
 
-				d  = h > 0? d : 0xff;
-				h1 = h > 0? h : 0;
+				H0[t] = h;
 
-				h -= gapoe;
-				e -= gape;
-				d |= e > h? 0x08 : 0;
-				e  = e > h? e    : h; 
-				e  = e > 0? e    : 0;
-				p->e = e;
+				int8_t u1;
+				int8_t z = s[t] + qe2;
+				int8_t a = x1   + v1;
+				int8_t b = y[t] + u[t];
+				z = a > z? a : z;
+				z = b > z? b : z;
+				
+				u1 = u[t];            
+				u[t] = z - v1;     
+				v1 = v[t];            
+				v[t] = z - u1; 
 
-				f -= gape;
-				f  = f > 0? f : 0;
-				f  = f > h? f    : h;
-				d |= f > h? 0x10 : 0;
+				z -= q;
+				a -= z;
+				b -= z;
+				x1 = x[t];   
 
-				zi[j - st] = d; 
-			} 
+				d   |= a > 0? 0x08 : 0;
+				x[t] = a > 0? a    : 0;
+				d   |= b > 0? 0x10 : 0;
+				y[t] = b > 0? b    : 0; 
+
+				if(h == 0) d = 0xff;
+				pr[t - st] = d;
+			}
+			int32_t *tmp = H2;
+			H2 = H1;
+			H1 = H0;
+			H0 = tmp;
 		} else {
-			for (j = st; j < en; ++j) {
-				eh_t *p = &eh[j];
-				int32_t h = p->h, e = p->e;
-				p->h = h1;
-				h += q[j];
-				
-				h = h >= e? h : e;
-				h = h >= f? h : f;
+			for (t = st; t <= en; ++t) {
+				int32_t h = 0;
+				if (t - 1 >= 0 && (t - 1) >= ((r - 2) - qlen + 1)) {  
+					h = H2[t - 1] + s[t] > h ? H2[t - 1] + s[t] : h;
+				} else {
+					h = s[t] > h ? s[t] : h;
+				}
+                if (H1[t] >= 0) {
+                    h = H1[t] - qe > h? H1[t] - qe : h;
+                }
+                if (t - 1 >= 0) {
+                    h = H0[t - 1] - qe > h? H0[t - 1] - qe : h;
+                }
 
 				if (h > max_score) {
 					max_score = h;
-					end_t = i;
-					end_q = j;
+					end_t = t;
+					end_r = r;
 				}
 
-				h1 = h > 0? h : 0;
-
-				h -= gapoe;
-				e -= gape;
-				e  = e > 0? e : 0;
-				e  = e > h? e : h;
-				p->e = e;
-				
-				f -= gape;
-				f  = f > 0? f : 0;
-				f  = f > h? f : h;
-			}			
+				H0[t] = h;
+			}
+			int32_t *tmp = H2;
+			H2 = H1;
+			H1 = H0;
+			H0 = tmp;
 		}
-		eh[en].h = h1, eh[en].e = KSW_NEG_INF;
 	}
-	kfree(km, qp); kfree(km, eh);
+	kfree(km, u); kfree(km, v); kfree(km, x); kfree(km, y); kfree(km, s); kfree(km, qr);
 	if (m_cigar_ && n_cigar_ && cigar_) {
-		ksw_sw_backtrack(km, 0, 0, 0, z, off, 0, n_col, end_t, end_q, m_cigar_, n_cigar_, cigar_);
-		kfree(km, z);
-		kfree(km, off);
+		int end_q = end_r - end_t;
+		if (end_t < 0) end_t = 0;
+		if (end_t >= tlen) end_t = tlen - 1;
+		if (end_q < 0) end_q = 0;
+		if (end_q >= qlen) end_q = qlen - 1;
+		ksw_sw_backtrack(km, 1, 0, 0, p, off, 0, n_col, end_t, end_q, m_cigar_, n_cigar_, cigar_);
+		kfree(km, p); kfree(km, off);
 	}
 	return max_score;
 }
