@@ -1,3 +1,6 @@
+/*
+本代码由ai完成，由于还是维护了绝对E、F、H，感觉没有体现做差分的意义，目前没有想到很好的手法在差分写法下维护 SW 的全局最优值，因此这份代码先暂时放这
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
