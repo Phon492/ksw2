@@ -62,11 +62,11 @@ int ksw_sw2(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *t
 				}
                 // 删除：H(r,t) = H(r-1, t) - q - e
                 if (H1[t] >= 0) {
-                    h = H1[t] - q - e > h? H1[t] - q - e : h;
+                    h = H1[t] - q - e > h? H1[t] - qe : h;
                 }
                 // 插入：H(r,t) = H(r, t-1) - q - e
                 if (t - 1 >= 0) {
-                    h = H0[t - 1] - q - e > h? H0[t - 1] - q - e : h;
+                    h = H0[t - 1] - q - e > h? H0[t - 1] - qe : h;
                 }
 
 				if (h > max_score) {
@@ -118,11 +118,11 @@ int ksw_sw2(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *t
 				}
                 // 删除：H(r,t) = H(r-1, t) - q - e
                 if (H1[t] >= 0) {
-                    h = H1[t] - q - e > h? H1[t] - q - e : h;
+                    h = H1[t] - q - e > h? H1[t] - qe : h;
                 }
                 // 插入：H(r,t) = H(r, t-1) - q - e
                 if (t - 1 >= 0) {
-                    h = H0[t - 1] - q - e > h? H0[t - 1] - q - e : h;
+                    h = H0[t - 1] - q - e > h? H0[t - 1] - qe : h;
                 }
 
 				if (h > max_score) {
