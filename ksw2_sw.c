@@ -58,6 +58,7 @@ int ksw_sw(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *ta
 					end_q = j;
 				}
 
+				d  = h > 0? d : 0xff;
 				h1 = h > 0? h : 0;
 
 				h -= gapoe;
