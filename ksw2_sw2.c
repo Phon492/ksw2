@@ -70,7 +70,7 @@ int ksw_sw2(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *t
 			        int32_t del_val = H1[t] - q - e;
 			        if (del_val > h) {
 			            h = del_val;
-			            d = 1;  // 方向：删除
+			            d = 1;
 			        }
                 }
                 // 插入：H(r,t) = H(r, t-1) - q - e
@@ -78,7 +78,7 @@ int ksw_sw2(void *km, int qlen, const uint8_t *query, int tlen, const uint8_t *t
 			        int32_t ins_val = H0[t - 1] - q - e;
 			        if (ins_val > h) {
 			            h = ins_val;
-			            d = 2;  // 方向：插入
+			            d = 2;
 			        }
                 }
 
