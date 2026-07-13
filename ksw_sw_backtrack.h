@@ -21,6 +21,7 @@ static inline void ksw_sw_backtrack(void *km, int is_rot, int is_rev, int min_in
 			if (off_end && j > off_end[i]) force_state = 1;
 			tmp = force_state < 0? p[(size_t)i * n_col + j - off[i]] : 0;
 		}
+		if(tmp == 0xff) break;
 		if (state == 0) state = tmp & 7; 
 		else if (!(tmp >> (state + 2) & 1)) state = 0; 
 		if (state == 0) state = tmp & 7;
