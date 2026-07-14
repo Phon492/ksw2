@@ -137,13 +137,11 @@ $$
 
 ### H的状态转移方程（SW2）
 
-匹配：$H(r,t) = H(r-2, t-1) + S(i,j)$
+* 匹配：$H(r,t) = H(r-2, t-1) + S(i,j)$
+* 删除：$H(r,t) = H(r-1, t) - q - e$
+* 插入：$H(r,t) = H(r, t-1) - q - e$
 
-删除：$H(r,t) = H(r-1, t) - q - e$
-
-插入：$H(r,t) = H(r, t-1) - q - e$
-
-最终在三种情况里取最优 H
+* 最终在三种情况里取最优 H
 ## 在 `ksw2_gg2_sse.c` 中
 
 * **SIMD（Single Instruction, Multiple Data）**：用一条指令，同时对多组数据执行相同的操作
