@@ -113,7 +113,8 @@ $$
 * 得 $u_{r,t}=z_{r,t}-v_{r-1,t-1}$ 
 * 得 $v_{r,t}=z_{r,t}-u_{r-1,t}$ 
 * 得 $x_{r,t}=\max\{(0,x_{r-1,t-1}+v_{r-1,t-1}-z_{r,t}+q)\}$ 
-* 得 $y_{r.t}=\max\{(0,y_{r-1,t}+u_{r-1,t}-z_{r,t}+q)\}$ 
+* 得 $y_{r.t}=\max\{(0,y_{r-1,t}+u_{r-1,t}-z_{r,t}+q)\}$
+* 由 $0 \le i \le tlen - 1,\ 0 \le j \le qlen - 1,\ |i - j| \le w$
 * 可知 $0\le r\le qlen + tlen-2$  与 $\max \{(0,r-qlen+1,\frac{r-w}{2})\}\le t\le\min\{(tlen-1,r,\frac{r+w}{2})\}$
 
 ## 在 `ksw2_sw2.c` 中
